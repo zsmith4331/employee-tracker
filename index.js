@@ -1,6 +1,6 @@
-const mysql = require("mysql");
-const { prompt } = require("inquirer");
 const inquirer = require("inquirer");
+const mysql = require("mysql");
+const { tablePrinter } = require("console-table-printer");
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -16,7 +16,6 @@ const connection = mysql.createConnection({
     startApplicaiton();
   });
 
-
   const startApplicaiton = () => {
       inquirer.prompt({
             type: "list",
@@ -29,12 +28,12 @@ const connection = mysql.createConnection({
                 "View Roles",
                 "View Employees",
                 "Update Employee Role",
-                "Update Employees Manager",
-                "View Employees by Manager",
-                "Delete Department",
-                "Delete Role",
-                "Delete Employee",               
-                "View Total Utilized Budget by Department",
+                // "Update Employees Manager",
+                // "View Employees by Manager",
+                // "Delete Department",
+                // "Delete Role",
+                // "Delete Employee",               
+                // "View Total Utilized Budget by Department",
                 "Exit Applicaiton"
             ]
     
@@ -69,29 +68,29 @@ const connection = mysql.createConnection({
                     updateEmployeeRole();
                 break;
 
-                case "Update Employees Manager":
-                    updateEmployeeManager();
-                break;
+                // case "Update Employees Manager":
+                //     updateEmployeeManager();
+                // break;
                 
-                case "View Employees by Manager":
-                    viewEmployeeByMangaer();
-                break;
+                // case "View Employees by Manager":
+                //     viewEmployeeByMangaer();
+                // break;
                 
-                case "Delete Department":
-                    deleteDepartment();
-                break;
+                // case "Delete Department":
+                //     deleteDepartment();
+                // break;
                 
-                case "Delete Role":
-                    deleteRole();
-                break;
+                // case "Delete Role":
+                //     deleteRole();
+                // break;
 
-                case "Delete Employee":
-                    deleteEmployee();
-                break;
+                // case "Delete Employee":
+                //     deleteEmployee();
+                // break;
                 
-                case "View Total Utilized Budget by Department":
-                    viewTotalBudget();
-                break;
+                // case "View Total Utilized Budget by Department":
+                //     viewTotalBudget();
+                // break;
                 
                 case "Exit Applicaiton":
                     connection.end();
@@ -101,18 +100,113 @@ const connection = mysql.createConnection({
   };
 
 const addDepartment = () => { 
+    inquirer.prompt([
+        {
+        type: "input",
+        name: "addDepartment",
+        message: "What department would you like to add?",
+        }
+    ]).then((response) => {
+        connection.query(
+            "INSERT INTO department SET ?",
+            {
+                department_name: response.addDepartment,
+            },
+            (error) => {
+
+                if (error) throw error;
+                console.log("New department has been added.")
+
+                startApplicaiton();
+            }
+        )
+    })
 
 };
 
 const addRole = () => { 
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "title",
+            message: "What role would would you like to add?"
+        }
+    ]).then((response) => {
+        connection.query(
+            "INSERT INTO roles SET ?",
+            {
+                title: response.title
+            },
+            (error) => {
+                
+                if (error) throw error;
+                console.log("New role has been added.")
+
+                startApplicaiton();
+            }
+        )
+    });
 
 };
 
 const addEmployee = () => { 
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "first_name",
+            message: "Enter employees first name."
+        },
+        {
+            type: "input",
+            name: "last_name",
+            message: "Enter employees last name."
+        },
+
+        // Need to find a way to grab this data //
+
+        // {
+        //     type: "list",
+        //     name: "role",
+        //     message: "Select employees role."
+        // },
+        // {
+        //     type: "list",
+        //     name: "manager",
+        //     message: "Select employees manager."
+        // },
+
+    ]).then((response) => {
+        connection.query(
+            "INSERT INTO employee SET ?",
+            {
+                first_name: response.first_name,
+                last_name: response.last_name,
+                // role: response.role,
+                // manager: response.manager
+            },
+            (error) => {
+
+                if (error) throw error;
+                console.log("Employee has been added.")
+
+                startApplicaiton();
+            }
+        )
+    })
 
 };
 
 const viewDepartments = () => { 
+    connection.query(
+        "SELECT * FROM department", (error, response) => {
+
+            if (error) throw error;
+            tablePrinter(response);
+
+            startApplicaiton();
+
+        }
+    )
 
 };
 

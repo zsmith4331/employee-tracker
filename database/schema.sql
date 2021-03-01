@@ -6,10 +6,10 @@ USE employee_tracker;
 
 CREATE TABLE department (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    name VARCHAR(30) NOT NULL
+    department_name VARCHAR(30) NOT NULL
 ); 
 
-CREATE TABLE role (
+CREATE TABLE roles (
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
     title VARCHAR(30) NOT NULL,
     salary DECIMAL(8,2) NOT NULL,

@@ -1,12 +1,12 @@
 USE employee_tracker; 
 
-INSERT INTO department (name)
+INSERT INTO department (department_name)
 VALUES 	("Sales"),
 		("Engineering"),
         ("Finance"),
         ("Legal"); 
 
-INSERT INTO role (title, salary, department_id) 
+INSERT INTO roles (title, salary, department_id) 
 VALUES 	("Sales Lead", 100000, 1),
 		("Salesperson", 80000, 1),
         ("Lead Engineer", 150000, 2),
@@ -24,7 +24,5 @@ VALUES 	("John", "Doe", 1, null),
         ("Sarah", "Lourd", 6, null),
         ("Tom", "Allen", 7, 6); 
 
-UPDATE employee 
-SET manager_id = 3
-WHERE id = 1; 
+
 
