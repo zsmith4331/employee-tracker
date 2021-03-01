@@ -16,42 +16,137 @@ const connection = mysql.createConnection({
     startApplicaiton();
   });
 
+
   const startApplicaiton = () => {
       inquirer.prompt({
             type: "list",
-            message: "Where would you like to begin",
+            message: "Where would you like to begin?",
             choice: [
-                "View all employees",
-                "Add new employee",
-                "Update existing employee",
-                "Exit applicaiton"
+                "Add Department",
+                "Add Role",
+                "Add Employee",
+                "View Departments",
+                "View Roles",
+                "View Employees",
+                "Update Employee Role",
+                "Update Employees Manager",
+                "View Employees by Manager",
+                "Delete Department",
+                "Delete Role",
+                "Delete Employee",               
+                "View Total Utilized Budget by Department",
+                "Exit Applicaiton"
             ]
     
       }).then((response) => {
-          if(response.choice === "View all employees") {
-              viewAllEmployees();
-          } else if (response.choice === "Add new employee") {
-              addNewEmployee();
-          } else if (response.choice === "Update existing employee") {
-              updateExistingEmployee();
-          } else {
-              connection.end();
+          switch (response.choice) {
+
+                case "Add Department":
+                    addDepartment();
+                break;
+
+                case "Add Role":
+                    addRole();
+                break;
+
+                case "Add Employee":
+                    addEmployee();
+                break;
+
+                case "View Departments":
+                    viewDepartments();
+                break;
+
+                case "View Roles":
+                    viewRoles();
+                break;
+
+                case "View Employees":
+                    viewEmployees();
+                break;
+                    
+                case "Update Employee Role":
+                    updateEmployeeRole();
+                break;
+
+                case "Update Employees Manager":
+                    updateEmployeeManager();
+                break;
+                
+                case "View Employees by Manager":
+                    viewEmployeeByMangaer();
+                break;
+                
+                case "Delete Department":
+                    deleteDepartment();
+                break;
+                
+                case "Delete Role":
+                    deleteRole();
+                break;
+
+                case "Delete Employee":
+                    deleteEmployee();
+                break;
+                
+                case "View Total Utilized Budget by Department":
+                    viewTotalBudget();
+                break;
+                
+                case "Exit Applicaiton":
+                    connection.end();
+                break;
           }
       });
   };
 
-  const viewAllEmployees = () => {
-      inquirer.prompt([
-          {
+const addDepartment = () => { 
 
-          }
-      ])
-  };
+};
 
-  const addNewEmployee = () => { 
+const addRole = () => { 
 
-  };
+};
 
-  const updateExistingEmployee = () => {
+const addEmployee = () => { 
 
-  };
+};
+
+const viewDepartments = () => { 
+
+};
+
+const viewRoles = () => { 
+
+};
+
+const viewEmployees= () => { 
+
+};
+const updateEmployeeRole = () => { 
+
+};
+
+const updateEmployeeManager = () => { 
+
+};
+
+const viewEmployeeByMangaer = () => { 
+
+};
+
+const deleteDepartment = () => { 
+
+};
+
+const deleteRole = () => { 
+
+};
+
+const deleteEmployee = () => { 
+
+};
+
+const viewTotalBudget = () => {
+
+};
