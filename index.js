@@ -191,64 +191,67 @@ const addEmployee = () => {
 
         const role = response.map((role) => {
             return {
-                id: role.id,
+                value: role.id,
                 name: role.title
             };
         });
 
         connection.query("select * from employee", (error, response) => {
 
-            const employeeManager = response.map((employee) => {
+            const manager = response.map((employee) => {
                 
                 return {
-                    id: employee.id,
+                    value: employee.id,
                     name: employee.first_name + " " + employee.last_name
                 };
             });
 
-        });        
-        inquirer.prompt([
-            {
-                type: "input",
-                name: "first_name",
-                message: "Enter employees first name."
-            },
-            {
-                type: "input",
-                name: "last_name",
-                message: "Enter employees last name."
-            },
-            {
-                type: "list",
-                name: "role",
-                message: "Select employees role.",
-                choices: role
-            },
-            {
-                type: "list",
-                name: "manager",
-                message: "Select employees manager.",
-                choices: employeeManager
-            },
-
-        ]).then((response) => {
-
-            connection.query("INSERT INTO employee SET ?",
+            inquirer.prompt([
                 {
-                    first_name: response.first_name,
-                    last_name: response.last_name,
-                    role: response.role,
-                    employeeManager: response.employeeManager
+                    type: "input",
+                    name: "first_name",
+                    message: "Enter employees first name."
                 },
-                (error) => {
+                {
+                    type: "input",
+                    name: "last_name",
+                    message: "Enter employees last name."
+                },
+                {
+                    type: "list",
+                    name: "role",
+                    message: "Select employees role.",
+                    choices: role
+                },
+                {
+                    type: "list",
+                    name: "manager",
+                    message: "Select employees manager.",
+                    choices: manager
+                },
+    
+            ]).then((response) => {
+    
+                connection.query("INSERT INTO employee SET ?",
+                    {
+                        first_name: response.first_name,
+                        last_name: response.last_name,
+                        role: response.role,
+                        manager_id: response.employeeManager
+                    },
+                    (error) => {
+    
+                        if (error) throw error;
+                        console.log(chalk.greenBright("\nNew Employee has been added.\n"))
+    
+                        startApplication();
+                    }
+                )
+            }); 
 
-                    if (error) throw error;
-                    console.log(chalk.greenBright("\nNew Employee has been added.\n"))
-
-                    startApplication();
-                }
-            )
         });
+              
+        
 
     });
 };
