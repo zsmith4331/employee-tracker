@@ -20,7 +20,8 @@ const connection = mysql.createConnection({
       inquirer.prompt({
             type: "list",
             message: "Where would you like to begin?",
-            choice: [
+            name:"startApplication",
+            choices: [
                 "Add Department",
                 "Add Role",
                 "Add Employee",
