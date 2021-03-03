@@ -21,6 +21,7 @@ const connection = mysql.createConnection({
       if (error) throw error;
       console.log(CFonts.say("Employee Tracker", {
             font: "block",
+            align: "center",
             colors: ["greenbright"],
         }));
         
@@ -155,17 +156,17 @@ const addRole = () => {
             {
                 type: "input",
                 name: "title",
-                message: "What role would would you like to add?"
+                message: "\nWhat role would would you like to add?"
             },
             {
                 type: "input",
                 name: "salary",
-                message: "What is the salary for the role?"
+                message: "\nWhat is the salary for the role?"
             },
             {
                 type: "list",
                 name: "department_id",
-                message: "Which department is this role assigned to?",
+                message: (chalk.greenBright("\nPlease select department assigned to this role from below:\n")),
                 choices: departmentList
             }
         ]).then((response) => {
@@ -189,77 +190,77 @@ const addRole = () => {
 
 };
 
-const addEmployee = () => { 
-    connection.query("select * from role", (error, response) => {
+const addEmployee = () => {
+    connection.query(
+        "select * from role",
+        (error, response) => {
 
         const role = response.map((role) => {
             return {
                 value: role.id,
-                name: role.title
+                name: role.title                
             };
         });
 
         connection.query(
             "select * from employee",
             (error, response) => {
-
+            
             const employeeManager = response.map((employee) => {
-                
                 return {
+
                     value: employee.id,
-                    name: employee.first_name + " " + employee.last_name
+                    name: employee.first_name + " " + employee.last_name,
+                    
                 };
-            });
-
-+            inquirer.prompt([
-                {
-                    type: "input",
-                    name: "first_name",
-                    message: "Enter employees first name."
-                },
-                {
-                    type: "input",
-                    name: "last_name",
-                    message: "Enter employees last name."
-                },
-                {
-                    type: "list",
-                    name: "role",
-                    message: "Select employees role.",
-                    choices: role
-                },
-                {
-                    type: "list",
-                    name: "manager",
-                    message: "Select employees manager.",
-                    choices: employeeManager
-                },
-    
-            ]).then((response) => {
-    
-                connection.query("INSERT INTO employee SET ?",
-                    {
-                        first_name: response.first_name,
-                        last_name: response.last_name,
-                        role: response.role,
-                        manager_id: response.employeeManager
-                    },
-                    (error) => {
-    
-                        if (error) throw error;
-                        console.log(chalk.magentaBright("\nNew Employee has been added.\n"))
-    
-                        startApplication();
-                    }
-                )
-            }); 
-
         });
+        inquirer.prompt([
+            {
+              type: "input",
+              name: "first_name",
+              message: "Enter employees first name.",
               
-        
+            },
+            {
+              type: "input",
+              name: "last_name",
+              message: "Enter employees last name",
+              
+            },
+            {
+              type: "list",
+              message: "Select employees role.",
+              name: "role",
+              choices: role,
+            },
+            {
+              type: "list",
+              message: "Select employees manager",
+              name: "manager",
+              choices: employeeManager,
+            },
+          ]).then((response) => {
 
+            connection.query(
+              "INSERT INTO employee SET ?",
+              {
+                first_name: response.first_name,
+                last_name: response.last_name,
+                role_id: response.role,
+                manager_id: response.manager,
+              },
+              (error) => {
+
+                if (error) throw error;
+                console.log(chalk.magentaBright("\nNew Employee has been added.\n"))
+                
+                startApplication();
+              }
+            );
+          });
+      });
     });
-};
+  };
 
 
 const viewDepartments = () => { 
