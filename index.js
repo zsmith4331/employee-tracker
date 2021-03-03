@@ -33,7 +33,7 @@ const connection = mysql.createConnection({
   const startApplication = () => {
       inquirer.prompt({
             type: "list",
-            message: (chalk.greenBright("Please select task you would like tom complete from below:\n")),
+            message: (chalk.greenBright("Please select task you would like to complete from below:\n")),
             name:"choiceSelection",
             choices: [
                 "Add Department",
@@ -359,10 +359,10 @@ const updateEmployeeRole = () => {
                         choices: updateEmployeeManager
 
                     }
-                ]).then((response) => {                    
-                    let newEmployee = response.employee;
-                    let newRole = response.role;
-                    let newManager = response.manager;
+                ]).then((response) => {
+                    let newEmployee = response.Employee;
+                    let newRole = response.Role;                    
+                    let newManager = response.Manager;
 
                     connection.query(
                         `update employee set role_id=${newRole} where id=${newEmployee}`
