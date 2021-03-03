@@ -126,27 +126,52 @@ const addDepartment = () => {
 };
 
 const addRole = () => { 
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "title",
-            message: "What role would would you like to add?"
-        }
-    ]).then((response) => {
-        connection.query(
-            "INSERT INTO roles SET ?",
-            {
-                title: response.title
-            },
-            (error) => {
-                
-                if (error) throw error;
-                console.log("New role has been added.")
-
-                startApplicaiton();
+    connection.query("select * from department", (error, response) => {
+        const department = response.map((department) => {
+            return {
+                id: department.id,
+                name: department.department_name
             }
-        )
-    });
+        });
+
+        if(error) throw error;
+
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "title",
+                message: "What role would would you like to add?"
+            },
+            {
+                type: "input",
+                name: "salary",
+                message: "What is the salary for the role?"
+            },
+            {
+                type: "list",
+                name: "departmentId",
+                message: "Which department is this role assigned to?",
+                choices: department
+            }
+        ]).then((response) => {
+            connection.query(
+                "INSERT INTO roles SET ?",
+                {
+                    title: response.title,
+                    salary: response.salary,
+                    departmentId: response.departmentId
+                },
+                (error) => {
+                    
+                    if (error) throw error;
+                    console.log("New role has been added.")
+    
+                    startApplicaiton();
+                }
+            )
+        });
+    })
+   
 
 };
 
