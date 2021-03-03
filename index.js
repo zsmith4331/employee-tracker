@@ -2,6 +2,7 @@ const inquirer = require("inquirer");
 const mysql = require("mysql");
 const { printTable } = require("console-table-printer");
 const CFonts = require("cfonts");
+const chalk = require("chalk");
 
 
 const connection = mysql.createConnection({
@@ -18,8 +19,7 @@ const connection = mysql.createConnection({
       if (err) throw err;
       console.log(CFonts.say("Employee Tracker", {
         font: "block",
-        colors: ["greenbright"],
-        lineHeight: 2
+        colors: ["greenbright"]
       }));
   
       startApplication();
@@ -29,8 +29,8 @@ const connection = mysql.createConnection({
   const startApplication = () => {
       inquirer.prompt({
             type: "list",
-            message: "Where would you like to begin?",
-            name:"startApplication",
+            message: "Please select task you would like tom complete from below.",
+            name:"choiceSelection",
             choices: [
                 "Add Department",
                 "Add Role",
@@ -49,7 +49,8 @@ const connection = mysql.createConnection({
             ]
     
       }).then((response) => {
-          switch (response.choice) {
+          
+          switch (response.choiceSelection) {
 
                 case "Add Department":
                     addDepartment();
@@ -122,11 +123,12 @@ const addDepartment = () => {
             "INSERT INTO department SET ?",
             {
                 department_name: response.addDepartment,
+                
             },
             (error) => {
 
                 if (error) throw error;
-                console.log("New department has been added.")
+                console.log(chalk.greenBright("\nNew department has been added.\n"))
 
                 startApplication();
             }
@@ -137,10 +139,10 @@ const addDepartment = () => {
 
 const addRole = () => { 
     connection.query("select * from department", (error, response) => {
-        const department = response.map((department) => {
+        const departmentList = response.map((departmentList) => {
             return {
-                id: department.id,
-                name: department.department_name
+                value: departmentList.id,
+                name: departmentList.department_name
             };
         });
 
@@ -159,21 +161,21 @@ const addRole = () => {
             },
             {
                 type: "list",
-                name: "departmentId",
+                name: "department_id",
                 message: "Which department is this role assigned to?",
-                choices: department
+                choices: departmentList
             }
         ]).then((response) => {
-            connection.query("INSERT INTO roles SET ?",
+            connection.query("INSERT INTO role SET ?",
                 {
                     title: response.title,
                     salary: response.salary,
-                    departmentId: response.departmentId
+                    department_id: response.department_id
                 },
                 (error) => {
                     
                     if (error) throw error;
-                    console.log("New role has been added.")
+                    console.log(chalk.greenBright("\nNew role has been added.\n"))
     
                     startApplication();
                 }
@@ -185,12 +187,12 @@ const addRole = () => {
 };
 
 const addEmployee = () => { 
-    connection.query("select * from roles", (error, response) => {
+    connection.query("select * from role", (error, response) => {
 
-        const roles = response.map((roles) => {
+        const role = response.map((role) => {
             return {
-                id: roles.id,
-                name: roles.title
+                id: role.id,
+                name: role.title
             };
         });
 
@@ -220,7 +222,7 @@ const addEmployee = () => {
                 type: "list",
                 name: "role",
                 message: "Select employees role.",
-                choices: roles
+                choices: role
             },
             {
                 type: "list",
@@ -241,7 +243,7 @@ const addEmployee = () => {
                 (error) => {
 
                     if (error) throw error;
-                    console.log("Employee has been added.")
+                    console.log(chalk.greenBright("\nNew Employee has been added.\n"))
 
                     startApplication();
                 }
