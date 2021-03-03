@@ -325,29 +325,50 @@ const updateEmployeeRole = () => {
             (error, response) => {
                 const updateEmployee = response.map((employee) => {
                     return {
+                        value: employee.id,
                         name: employee.first_name + " " + employee.last_name,
-                        value: employee.id
+                    };
+                });
+
+                connection.query("select * from employee",
+                (error, response) => {
+                const updateEmployeeManager = response.map((employee) => {
+                    return {
+                        value: employee.id,
+                        name: employee.first_name + " " + employee.last_name,
+                        manager: employee.manager_id
                     };
                 });
                 inquirer.prompt([
                     {
                         type: "list",
-                        name: "employee",
+                        name: "Employee",
                         message: console.log(chalk.greenBright("\nPlease select the employee to update from below:\n")),
                         choices: updateEmployee
                     },
                     {
                         type: "list",
-                        name: "role",
+                        name: "Role",
                         message: console.log(chalk.greenBright("\nPlease select the employees new role from below:\n")),
                         choices: updatedEmployeeRole
                     },
+                    {
+                        type: "list",
+                        name: "Manager",
+                        message: console.log(chalk.greenBright("\nPlease select the employees Manager from below:\n")),
+                        choices: updateEmployeeManager
+
+                    }
                 ]).then((response) => {
                     let newRole = response.role;
                     let newEmployee = response.employee;
+                    let newManager = response.manager;
 
                     connection.query(
                         `update employee set role_id=${newRole} where id=${newEmployee}`
+                    );
+                    connection.query(
+                        `update employee set manager_id=${newManager} where id=${newEmployee}`
                     );
 
                     if (error) throw error;
@@ -355,11 +376,11 @@ const updateEmployeeRole = () => {
 
                     startApplication();
                 })
-            }
-            )
+            });
         }
     )
 
+})
 };
 
 // const updateEmployeeManager = () => { 
