@@ -1,6 +1,8 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql");
-const { tablePrinter } = require("console-table-printer");
+const { printTable } = require("console-table-printer");
+const CFonts = require("cfonts");
+
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -11,12 +13,20 @@ const connection = mysql.createConnection({
     database: "employee_tracker",
   });
 
-  connection.connect((error) => {
-    if (error) throw error;
-    startApplicaiton();
-  });
+  const startSession = () => {
+    connection.connect((err) => {
+      if (err) throw err;
+      console.log(CFonts.say("Employee Tracker", {
+        font: "block",
+        colors: ["greenbright"],
+        lineHeight: 2
+      }));
+  
+      startApplication();
+    });
+  };
 
-  const startApplicaiton = () => {
+  const startApplication = () => {
       inquirer.prompt({
             type: "list",
             message: "Where would you like to begin?",
@@ -118,7 +128,7 @@ const addDepartment = () => {
                 if (error) throw error;
                 console.log("New department has been added.")
 
-                startApplicaiton();
+                startApplication();
             }
         )
     })
@@ -131,7 +141,7 @@ const addRole = () => {
             return {
                 id: department.id,
                 name: department.department_name
-            }
+            };
         });
 
         if(error) throw error;
@@ -154,8 +164,7 @@ const addRole = () => {
                 choices: department
             }
         ]).then((response) => {
-            connection.query(
-                "INSERT INTO roles SET ?",
+            connection.query("INSERT INTO roles SET ?",
                 {
                     title: response.title,
                     salary: response.salary,
@@ -166,7 +175,7 @@ const addRole = () => {
                     if (error) throw error;
                     console.log("New role has been added.")
     
-                    startApplicaiton();
+                    startApplication();
                 }
             )
         });
@@ -176,60 +185,81 @@ const addRole = () => {
 };
 
 const addEmployee = () => { 
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "first_name",
-            message: "Enter employees first name."
-        },
-        {
-            type: "input",
-            name: "last_name",
-            message: "Enter employees last name."
-        },
+    connection.query("select * from roles", (error, response) => {
 
-        // Need to find a way to grab this data //
+        const roles = response.map((roles) => {
+            return {
+                id: roles.id,
+                name: roles.title
+            };
+        });
 
-        // {
-        //     type: "list",
-        //     name: "role",
-        //     message: "Select employees role."
-        // },
-        // {
-        //     type: "list",
-        //     name: "manager",
-        //     message: "Select employees manager."
-        // },
+        connection.query("select * from employee", (error, response) => {
 
-    ]).then((response) => {
-        connection.query(
-            "INSERT INTO employee SET ?",
+            const employeeManager = response.map((employee) => {
+                
+                return {
+                    id: employee.id,
+                    name: employee.first_name + " " + employee.last_name
+                };
+            });
+
+        });        
+        inquirer.prompt([
             {
-                first_name: response.first_name,
-                last_name: response.last_name,
-                // role: response.role,
-                // manager: response.manager
+                type: "input",
+                name: "first_name",
+                message: "Enter employees first name."
             },
-            (error) => {
+            {
+                type: "input",
+                name: "last_name",
+                message: "Enter employees last name."
+            },
+            {
+                type: "list",
+                name: "role",
+                message: "Select employees role.",
+                choices: roles
+            },
+            {
+                type: "list",
+                name: "manager",
+                message: "Select employees manager.",
+                choices: employeeManager
+            },
 
-                if (error) throw error;
-                console.log("Employee has been added.")
+        ]).then((response) => {
 
-                startApplicaiton();
-            }
-        )
-    })
+            connection.query("INSERT INTO employee SET ?",
+                {
+                    first_name: response.first_name,
+                    last_name: response.last_name,
+                    role: response.role,
+                    employeeManager: response.employeeManager
+                },
+                (error) => {
 
+                    if (error) throw error;
+                    console.log("Employee has been added.")
+
+                    startApplication();
+                }
+            )
+        });
+
+    });
 };
+
 
 const viewDepartments = () => { 
     connection.query(
         "SELECT * FROM department", (error, response) => {
 
             if (error) throw error;
-            tablePrinter(response);
+            printTable(response);
 
-            startApplicaiton();
+            startApplication();
 
         }
     )
@@ -270,3 +300,5 @@ const deleteEmployee = () => {
 const viewTotalBudget = () => {
 
 };
+
+startSession();
