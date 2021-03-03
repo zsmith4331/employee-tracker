@@ -12,24 +12,27 @@ const connection = mysql.createConnection({
     // Update with your own mysql password //
     password: "Pathfinder#15",
     database: "employee_tracker",
+    
   });
 
   const startSession = () => {
-    connection.connect((err) => {
-      if (err) throw err;
+    connection.connect((error) => {
+
+      if (error) throw error;
       console.log(CFonts.say("Employee Tracker", {
-        font: "block",
-        colors: ["greenbright"]
-      }));
-  
+            font: "block",
+            colors: ["greenbright"],
+        }));
+        
       startApplication();
+      
     });
   };
 
   const startApplication = () => {
       inquirer.prompt({
             type: "list",
-            message: "Please select task you would like tom complete from below.",
+            message: (chalk.greenBright("Please select task you would like tom complete from below:\n")),
             name:"choiceSelection",
             choices: [
                 "Add Department",
@@ -116,7 +119,7 @@ const addDepartment = () => {
         {
         type: "input",
         name: "addDepartment",
-        message: "What department would you like to add?",
+        message: (chalk.greenBright("What department would you like to add?")),
         }
     ]).then((response) => {
         connection.query(
@@ -128,7 +131,7 @@ const addDepartment = () => {
             (error) => {
 
                 if (error) throw error;
-                console.log(chalk.greenBright("\nNew department has been added.\n"))
+                console.log(chalk.magentaBright("\nNew department has been added.\n"))
 
                 startApplication();
             }
@@ -175,7 +178,7 @@ const addRole = () => {
                 (error) => {
                     
                     if (error) throw error;
-                    console.log(chalk.greenBright("\nNew role has been added.\n"))
+                    console.log(chalk.magentaBright("\nNew role has been added.\n"))
     
                     startApplication();
                 }
@@ -196,9 +199,11 @@ const addEmployee = () => {
             };
         });
 
-        connection.query("select * from employee", (error, response) => {
+        connection.query(
+            "select * from employee",
+            (error, response) => {
 
-            const manager = response.map((employee) => {
+            const employeeManager = response.map((employee) => {
                 
                 return {
                     value: employee.id,
@@ -206,7 +211,7 @@ const addEmployee = () => {
                 };
             });
 
-            inquirer.prompt([
++            inquirer.prompt([
                 {
                     type: "input",
                     name: "first_name",
@@ -227,7 +232,7 @@ const addEmployee = () => {
                     type: "list",
                     name: "manager",
                     message: "Select employees manager.",
-                    choices: manager
+                    choices: employeeManager
                 },
     
             ]).then((response) => {
@@ -242,7 +247,7 @@ const addEmployee = () => {
                     (error) => {
     
                         if (error) throw error;
-                        console.log(chalk.greenBright("\nNew Employee has been added.\n"))
+                        console.log(chalk.magentaBright("\nNew Employee has been added.\n"))
     
                         startApplication();
                     }
@@ -259,51 +264,125 @@ const addEmployee = () => {
 
 const viewDepartments = () => { 
     connection.query(
-        "SELECT * FROM department", (error, response) => {
+        "SELECT * FROM department",
 
+        (error, response) => {
             if (error) throw error;
             printTable(response);
 
             startApplication();
+        }
+    );
 
+};
+
+const viewRoles = () => { 
+    connection.query(
+        `SELECT role.id, role.title, role.salary, (department.department_name) department
+        FROM role 
+        LEFT JOIN department
+        ON role.department_id = department.id;`,
+
+        (error, response) => {
+          if (error) throw error;
+          printTable(response);
+
+          startApplication();
+        }
+      );
+
+};
+
+const viewEmployees= () => { 
+    connection.query(
+        `SELECT employee.id, employee.first_name, employee.last_name, role.title, CONCAT(manager.first_name, " ", manager.last_name) manager
+        FROM employee 
+        LEFT JOIN role
+        ON employee.role_id=role.id
+        LEFT JOIN employee manager
+        ON manager.id=employee.manager_id;`,
+        (error, response) => {
+          if (error) throw error;
+          printTable(response);
+          startApplication();
+        }
+      );
+
+};
+const updateEmployeeRole = () => { 
+    connection.query(
+        "select * from role",
+        (error, response) => {
+            const updatedEmployeeRole = response.map((role) => {
+                return {
+                    name: role.title,
+                    value: role.id
+                };
+            });
+
+            connection.query("select * from employee",
+            (error, response) => {
+                const updateEmployee = response.map((employee) => {
+                    return {
+                        name: employee.first_name + " " + employee.last_name,
+                        value: employee.id
+                    };
+                });
+                inquirer.prompt([
+                    {
+                        type: "list",
+                        name: "employee",
+                        message: console.log(chalk.greenBright("\nPlease select the employee to update from below:\n")),
+                        choices: updateEmployee
+                    },
+                    {
+                        type: "list",
+                        name: "role",
+                        message: console.log(chalk.greenBright("\nPlease select the employees new role from below:\n")),
+                        choices: updatedEmployeeRole
+                    },
+                ]).then((response) => {
+                    let newRole = response.role;
+                    let newEmployee = response.employee;
+
+                    connection.query(
+                        `update employee set role_id=${newRole} where id=${newEmployee}`
+                    );
+
+                    if (error) throw error;
+                    console.log(chalk.magentaBright("\nUpdates have been completed!\n"));
+
+                    startApplication();
+                })
+            }
+            )
         }
     )
 
 };
 
-const viewRoles = () => { 
+// const updateEmployeeManager = () => { 
 
-};
+// };
 
-const viewEmployees= () => { 
+// const viewEmployeeByMangaer = () => { 
 
-};
-const updateEmployeeRole = () => { 
+// };
 
-};
+// const deleteDepartment = () => { 
 
-const updateEmployeeManager = () => { 
+// };
 
-};
+// const deleteRole = () => { 
 
-const viewEmployeeByMangaer = () => { 
+// };
 
-};
+// const deleteEmployee = () => { 
 
-const deleteDepartment = () => { 
+// };
 
-};
+// const viewTotalBudget = () => {
 
-const deleteRole = () => { 
-
-};
-
-const deleteEmployee = () => { 
-
-};
-
-const viewTotalBudget = () => {
-
-};
+// };
 
 startSession();
