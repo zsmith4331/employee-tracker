@@ -359,9 +359,9 @@ const updateEmployeeRole = () => {
                         choices: updateEmployeeManager
 
                     }
-                ]).then((response) => {
-                    let newRole = response.role;
+                ]).then((response) => {                    
                     let newEmployee = response.employee;
+                    let newRole = response.role;
                     let newManager = response.manager;
 
                     connection.query(
